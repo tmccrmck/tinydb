@@ -1,0 +1,6 @@
+[package]
+name = "tinydb"
+version = "0.1.0"
+authors = ["trent <tjmcc01@gmail.com>"]
+
+[dependencies]
