@@ -59,7 +59,7 @@ mod tests {
     }
 
     #[test]
-    fn test_serialize_vec() {
+    fn test_serd_serialize() {
         let mut btree: BTreeMap<Vec<u8>, Vec<u8>> = BTreeMap::new();
         btree.insert("a".as_bytes().to_vec(), "b".as_bytes().to_vec());
 
@@ -71,20 +71,6 @@ mod tests {
         let val = "b".as_bytes().to_vec();
         assert_eq!(new_map.get(&key), Some(&val));
     }
-
-    // #[test]
-    // fn test_serialize_slice() {
-    //     let mut btree: BTreeMap<&[u8], &[u8]> = BTreeMap::new();
-    //     btree.insert("a".as_bytes(), "b".as_bytes());
-
-    //     let limit = bincode::SizeLimit::Bounded(1000000);
-    //     let s: Vec<u8> = bincode::serde::serialize(&btree, limit).unwrap();
-    //     let new_map: BTreeMap<&[u8], &[u8]> = bincode::serde::deserialize(&s).unwrap();
-
-    //     let key = "a".as_bytes();
-    //     let val = "b".as_bytes();
-    //     assert_eq!(new_map.get(&key), Some(&val));
-    // }
 
     // #[test]
     // fn test_put_and_get(){
