@@ -7,26 +7,26 @@ trait CanSerialize<'a> {
 }
 
 impl<'a> CanSerialize<'a> for BTreeMap<&'a [u8], &'a [u8]> {
-	fn serialize(&self, map: &mut HashMap<&'a [u8], i32>) -> Vec<u8> {
-		let mut vals: Vec<u8> = Vec::new();
-		let mut offset = 0;
-		for (key, value) in self.iter() {
-		    vals.extend(value.iter().cloned());
-		    map.insert(key, offset);
+    fn serialize(&self, map: &mut HashMap<&'a [u8], i32>) -> Vec<u8> {
+        let mut vals: Vec<u8> = Vec::new();
+        let mut offset = 0;
+        for (key, value) in self.iter() {
+            vals.extend(value.iter().cloned());
+            map.insert(key, offset);
 
-		    offset += value.len() as i32;
-		}
-		return vals;
-	}
+            offset += value.len() as i32;
+        }
+        return vals;
+    }
 }
 
-#[cfg(test)]	
+#[cfg(test)]    
 mod tests {
-	use super::CanSerialize;
-	use std::collections::BTreeMap;
-	use std::collections::HashMap;
+    use super::CanSerialize;
+    use std::collections::BTreeMap;
+    use std::collections::HashMap;
 
-	#[test]
+    #[test]
     fn test_vector_small() {
         let mut t = BTreeMap::new();
         let mut h: HashMap<&[u8], i32> = HashMap::new();
@@ -53,7 +53,7 @@ mod tests {
 
     #[test]
     fn test_hash() {
-    	let mut t = BTreeMap::new();
+        let mut t = BTreeMap::new();
         let mut h: HashMap<&[u8], i32> = HashMap::new();
 
         t.insert("a".as_bytes(), "b".as_bytes());
@@ -65,7 +65,7 @@ mod tests {
 
         #[test]
     fn test_hash_long() {
-    	let mut t = BTreeMap::new();
+        let mut t = BTreeMap::new();
         let mut h: HashMap<&[u8], i32> = HashMap::new();
 
         t.insert("0".as_bytes(), "offset0".as_bytes());
@@ -73,8 +73,8 @@ mod tests {
         t.insert("14".as_bytes(), "offset14".as_bytes());
         t.serialize(&mut h);
 
-        // Order is weird here because it inserts them in
-        // the order offset0 => offset14 => offset7
+        // The order is weird here because it inserts
+        // them in the order offset0 => offset14 => offset7
         assert_eq!(h.get(&"0".as_bytes()), Some(&0));
         assert_eq!(h.get(&"14".as_bytes()), Some(&7));
         assert_eq!(h.get(&"7".as_bytes()), Some(&15));
