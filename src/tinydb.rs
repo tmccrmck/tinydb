@@ -1,23 +1,23 @@
+extern crate bincode;
+
 use std::io;
-use std::io::prelude::*;
-use std::fs::File;
+use std::path::PathBuf;
 use std::collections::BTreeMap;
 use std::collections::HashMap;
-extern crate bincode;
 
 
 pub struct Db<'a> {
-    file: File,
+    dir: PathBuf,
     btree: BTreeMap<&'a [u8], &'a [u8]>,
     offsets: HashMap<&'a [u8], i32>,
 }
 
 impl<'a> Db<'a> {
-    pub fn open(path: &'static str) -> Result<Self, io::Error> {
-        let file_ = try!(File::create(path));
+    pub fn open(dir: PathBuf) -> Result<Self, io::Error> {
+        //let file_ = try!(File::create(path));
         
         Ok(Db {
-            file: file_,
+            dir: dir,
             btree: BTreeMap::new(),
             offsets: HashMap::new(),
         })
@@ -46,32 +46,65 @@ impl<'a> Db<'a> {
         //     Some(x) => return Ok(Some(x.to_owned())),
         // }
     }
+
+    pub fn delete(&mut self, key: &[u8]) {
+        self.btree.remove(key);
+    }
 }
 
 #[cfg(test)]
 mod tests {
     extern crate bincode;
+    extern crate tempdir;
+
     use tinydb;
     use std::collections::BTreeMap;
+    use std::fs;
 
     #[test]
     fn test_open_ok() {
-        let d = tinydb::Db::open("test.db");
+        let tmp_dir = tempdir::TempDir::new("example").expect("create temp dir");
+
+        let d = tinydb::Db::open(tmp_dir.into_path());
         assert_eq!(d.is_ok(), true);
     }
 
     #[test]
     fn test_put_ok() {
-        let mut d = tinydb::Db::open("test.db").unwrap();
+        let tmp_dir = tempdir::TempDir::new("example").expect("create temp dir");
+
+        let mut d = tinydb::Db::open(tmp_dir.into_path()).unwrap();
         let w = d.put("a".as_bytes(), "b".as_bytes());
         assert_eq!(w.is_ok(), true);
     }
 
     #[test]
     fn test_put_get() {
-        let mut db = tinydb::Db::open("test.db").unwrap();
+        let tmp_dir = tempdir::TempDir::new("example").expect("create temp dir");
+
+        let mut db = tinydb::Db::open(tmp_dir.into_path()).unwrap();
         db.put(b"my key", b"my value");
         assert_eq!(db.get(b"my key").unwrap().unwrap(), "my value".as_bytes().to_vec());
+    }
+
+    #[test]
+    fn test_put_and_get_ok() {
+        let tmp_dir = tempdir::TempDir::new("example").expect("create temp dir");
+
+        let mut d = tinydb::Db::open(tmp_dir.into_path()).unwrap();
+        d.put("a".as_bytes(), "b".as_bytes());
+        let res = d.get("a".as_bytes()).unwrap();
+        assert_eq!(res.is_some(), true);
+    }
+
+    #[test]
+    fn test_delete() {
+        let tmp_dir = tempdir::TempDir::new("example").expect("create temp dir");
+
+        let mut db = tinydb::Db::open(tmp_dir.into_path()).unwrap();
+        db.put(b"my key", b"my value");
+        db.delete(b"my key");
+        assert_eq!(db.get(b"my key").unwrap(), None);
     }
 
     #[test]
@@ -88,11 +121,4 @@ mod tests {
         assert_eq!(new_map.get(&key), Some(&val));
     }
 
-    // #[test]
-    // fn test_put_and_get(){
-    //     let mut d = tinydb::Db::open("test1.db").unwrap();
-    //     let w = d.put("a".as_bytes(), "b".as_bytes());
-    //     let res = d.get("a".as_bytes()).unwrap();
-    //     assert_eq!(res.is_some(), true);
-    // }
 }
