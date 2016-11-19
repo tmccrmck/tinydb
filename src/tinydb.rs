@@ -25,7 +25,7 @@ impl<'a> Db<'a> {
 
     pub fn put(&mut self, key: &'a [u8], value: &'a [u8]) -> Result<usize, io::Error> {
         self.btree.insert(key, value);
-        return Ok(1); // placeholder
+        Ok(1)// placeholder
         //let limit = bincode::SizeLimit::Bounded(1000000);
         //let s: Vec<u8> = bincode::serde::serialize(&self.btree, limit).unwrap();
         //return self.file.write(&s);
@@ -74,7 +74,7 @@ mod tests {
         let tmp_dir = tempdir::TempDir::new("example").expect("create temp dir");
 
         let mut d = tinydb::Db::open(tmp_dir.into_path()).unwrap();
-        let w = d.put("a".as_bytes(), "b".as_bytes());
+        let w = d.put(b"a", b"b");
         assert_eq!(w.is_ok(), true);
     }
 
@@ -92,8 +92,8 @@ mod tests {
         let tmp_dir = tempdir::TempDir::new("example").expect("create temp dir");
 
         let mut d = tinydb::Db::open(tmp_dir.into_path()).unwrap();
-        d.put("a".as_bytes(), "b".as_bytes());
-        let res = d.get("a".as_bytes()).unwrap();
+        d.put(b"a", b"b");
+        let res = d.get(b"a").unwrap();
         assert_eq!(res.is_some(), true);
     }
 
@@ -110,14 +110,14 @@ mod tests {
     #[test]
     fn test_serd_serialize() {
         let mut btree: BTreeMap<Vec<u8>, Vec<u8>> = BTreeMap::new();
-        btree.insert("a".as_bytes().to_vec(), "b".as_bytes().to_vec());
+        btree.insert(b"a".to_vec(), b"b".to_vec());
 
         let limit = bincode::SizeLimit::Bounded(1000000);
         let s: Vec<u8> = bincode::serde::serialize(&btree, limit).unwrap();
         let new_map: BTreeMap<Vec<u8>, Vec<u8>> = bincode::serde::deserialize(&s).unwrap();
 
-        let key = "a".as_bytes().to_vec();
-        let val = "b".as_bytes().to_vec();
+        let key = b"a".to_vec();
+        let val = b"b".to_vec();
         assert_eq!(new_map.get(&key), Some(&val));
     }
 

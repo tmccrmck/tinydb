@@ -16,7 +16,7 @@ impl<'a> CanSerialize<'a> for BTreeMap<&'a [u8], &'a [u8]> {
 
             offset += value.len() as i32;
         }
-        return vals;
+        vals
     }
 }
 
