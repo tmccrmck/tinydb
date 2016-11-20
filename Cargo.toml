@@ -7,3 +7,4 @@ authors = ["trent <tjmcc01@gmail.com>"]
 
 bincode = "0.6.0"
 tempdir = "*"
+clippy = "*"
