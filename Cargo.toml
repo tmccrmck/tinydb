@@ -5,6 +5,5 @@ authors = ["trent <tjmcc01@gmail.com>"]
 
 [dependencies]
 
-bincode = "0.6.0"
 tempdir = "*"
 clippy = "*"
