@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 pub struct Db<'a> {
     dir: PathBuf,
-    btree: BTreeMap<&'a [u8], &'a [u8]>,
+    btree: BTreeMap<Vec<u8>, Vec<u8>>,
     offsets: HashMap<&'a [u8], i32>,
 }
 
@@ -22,7 +22,7 @@ impl<'a> Db<'a> {
     }
 
     pub fn put(&mut self, key: &'a [u8], value: &'a [u8]) -> Result<usize, io::Error> {
-        self.btree.insert(key, value);
+        self.btree.insert(key.to_vec(), value.to_vec());
         Ok(1)// placeholder
         //let limit = bincode::SizeLimit::Bounded(1000000);
         //let s: Vec<u8> = bincode::serde::serialize(&self.btree, limit).unwrap();
