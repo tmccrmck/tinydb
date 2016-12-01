@@ -8,6 +8,7 @@ pub struct Db<'a> {
     dir: PathBuf,
     btree: BTreeMap<Vec<u8>, Vec<u8>>,
     offsets: HashMap<&'a [u8], i32>,
+    total_bytes: i32,
 }
 
 impl<'a> Db<'a> {
@@ -18,11 +19,13 @@ impl<'a> Db<'a> {
             dir: dir,
             btree: BTreeMap::new(),
             offsets: HashMap::new(),
+            total_bytes: 0,
         })
     }
 
     pub fn put(&mut self, key: &'a [u8], value: &'a [u8]) -> Result<usize, io::Error> {
         self.btree.insert(key.to_vec(), value.to_vec());
+        self.total_bytes += key.len() as i32 + value.len() as i32;
         Ok(1)// placeholder
         //let limit = bincode::SizeLimit::Bounded(1000000);
         //let s: Vec<u8> = bincode::serde::serialize(&self.btree, limit).unwrap();
