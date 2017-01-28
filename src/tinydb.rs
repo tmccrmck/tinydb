@@ -3,6 +3,11 @@ use std::path::PathBuf;
 use std::collections::BTreeMap;
 use std::collections::HashMap;
 
+// use this https://github.com/carllerche/bytes
+
+// https://ayende.com/blog/162754/reviewing-lightning-memory-mapped-database-library-partial
+//https://ayende.com/blog/161410/reviewing-leveldb-part-i-what-is-this-all-about
+
 
 pub struct Db<'a> {
     dir: PathBuf,
@@ -26,10 +31,11 @@ impl<'a> Db<'a> {
     pub fn put(&mut self, key: &'a [u8], value: &'a [u8]) -> Result<usize, io::Error> {
         self.btree.insert(key.to_vec(), value.to_vec());
         self.total_bytes += key.len() as i32 + value.len() as i32;
-        Ok(1)// placeholder
-        //let limit = bincode::SizeLimit::Bounded(1000000);
-        //let s: Vec<u8> = bincode::serde::serialize(&self.btree, limit).unwrap();
-        //return self.file.write(&s);
+
+        if self.total_bytes > 100 {
+
+        }
+        Ok(1) // placeholder
     }
 
     pub fn get(&mut self, key: &[u8]) -> Result<Option<Vec<u8>>, io::Error> {
@@ -38,14 +44,6 @@ impl<'a> Db<'a> {
             Some(val) => Ok(Some(val.to_vec())),
             None => Ok(None),
         }
-        // let mut buf = Vec::new();
-        // try!(self.file.read_to_end(&mut buf));
-        // let map: BTreeMap<Vec<u8>, Vec<u8>> = bincode::serde::deserialize(&buf).unwrap();
-        // let rtn: Option<&Vec<u8>> = map.get(&key.to_vec());
-        // match rtn {
-        //     None => return Ok(None),
-        //     Some(x) => return Ok(Some(x.to_owned())),
-        // }
     }
 
     pub fn delete(&mut self, key: &[u8]) {

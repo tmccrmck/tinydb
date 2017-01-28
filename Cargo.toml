@@ -6,4 +6,3 @@ authors = ["trent <tjmcc01@gmail.com>"]
 [dependencies]
 
 tempdir = "*"
-clippy = "*"
